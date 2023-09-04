@@ -113,9 +113,11 @@
                     </span>
                   </a>
                 </li>
+{% if is_granted('ROLE_ADMIN') %}
                 <div style="margin:0 20px;">
                 <a class="btn btn-primary" href="{{ path('app_reclamation_index') }}"> Dashboard </a>
                 </div>
+                {%endif%}
               </ul>
             </div>
           </nav>
