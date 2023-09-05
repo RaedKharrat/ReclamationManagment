@@ -20,7 +20,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column]
     private array $roles = [];
-
+    // #[ORM\OneToMany(mappedBy: 'IdUser', targetEntity: Reclamation::class, orphanRemoval: true)]
+    // private Collection $reclamations;
     /**
      * @var string The hashed password
      */

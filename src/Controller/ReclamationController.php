@@ -43,11 +43,11 @@ public function ascendingAction(ReclamationRepository $reclamationRepository)
 }
 
 
-#[Route('/aboutttt', name: 'aboutttt', methods: ['GET'])]
-public function about(): Response
-{
-    return $this->render('about.html.twig');
-}
+// #[Route('/aboutttt', name: 'aboutttt', methods: ['GET'])]
+// public function about(): Response
+// {
+//     return $this->render('about.html.twig');
+// }
 
 
 #[Route('/triedesc', name: 'app_triedesc', methods: ['GET'])]
@@ -107,6 +107,7 @@ public function searchAction(Request $request, EntityManagerInterface $entityMan
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $reclamation->setIdUser($this->getUser());
             $reclamation->setEtatReservation(false);
             $entityManager->persist($reclamation);
             $entityManager->flush();
@@ -131,39 +132,39 @@ public function searchAction(Request $request, EntityManagerInterface $entityMan
     #[Route('/{id}/edit', name: 'app_reclamation_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Reclamation $reclamation, EntityManagerInterface $entityManager): Response
     {
-        $ref = $request->headers->get('referer');
-        switch($ref){
-            case "http://localhost:8000/reclamation/mesreclamation":
-            $form = $this->createForm(ReclamationType::class, $reclamation);
-            $form->handleRequest($request);
-    
-            if ($form->isSubmitted() && $form->isValid()) {
-                $entityManager->flush();
-    
-                return $this->redirectToRoute('app_reclamation_index', [], Response::HTTP_SEE_OTHER);
-            }
-    
-            return $this->renderForm('reclamation/edit.html.twig', [
-                'reclamation' => $reclamation,
-                'form' => $form,
-            ]);
-            break;
-            default:
+        if ($this->isGranted('ROLE_ADMIN') && $this->getUser()!= $reclamation->getIdUser()) {
             $form = $this->createForm(ReponseType::class, $reclamation);
             $form->handleRequest($request);
-    
             if ($form->isSubmitted() && $form->isValid()) {
                 $reclamation->setEtatReservation(true);
                 $entityManager->persist($reclamation);
                 $entityManager->flush();
                 return $this->redirectToRoute('app_reclamation_index', [], Response::HTTP_SEE_OTHER);
             }
-    
             return $this->renderForm('reclamation/reponse.html.twig', [
                 'reclamation' => $reclamation,
                 'form' => $form,
             ]);
+        } 
+        if($this->getUser() == $reclamation->getIdUser() && null != $reclamation->getReponse()){
+            return new Response("<script>alert('You can\'t answer your own reclamation!');window.location.href='/reclamation';</script>");
         }
+        $formu = $this->createForm(ReclamationType::class, $reclamation);
+        $formu->handleRequest($request);
+
+        if ($formu->isSubmitted() && $formu->isValid()) {
+            $entityManager->persist($reclamation);
+
+            $entityManager->flush();
+
+            return $this->redirectToRoute('mesreclamation', [], Response::HTTP_SEE_OTHER);
+        }
+
+        return $this->renderForm('reclamation/edit.html.twig', [
+            'reclamation' => $reclamation,
+            'form' => $formu,
+        ]);
+           
 
        
     }

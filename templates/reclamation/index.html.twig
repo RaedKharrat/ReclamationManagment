@@ -39,12 +39,14 @@
                 
                 <td>{{ reclamation.dateRec ? reclamation.dateRec|date('Y-m-d') : '' }}</td>
                 <td>{{ reclamation.recText }}</td>
-                <td>{{ reclamation.etatReservation == true ? "Closed" : "Open" }}</td>
+                {% set isClosed = reclamation.etatReservation == true %}
+                <td>{{ isClosed ? "Closed" : "Open" }}</td>
                 <td>
                     <a href="{{ path('app_reclamation_show', {'id': reclamation.id}) }}" class="btn btn-secondary">Show</a>
-                    <a href="{{ path('app_reclamation_edit', {'id': reclamation.id}) }}" class="btn btn-success">Respond</a>
+                    {% if app.user != reclamation.getIdUser %}
+                    <a href="{{ path('app_reclamation_edit', {'id': reclamation.id}) }}" class="btn btn-success">{{  isClosed ? "Closed" : "Respond" }} </a>
+                    {% endif %}
                     <a href="{{ path('app_reclamation_delete', {'id': reclamation.id}) }} " class="btn btn-danger">Delete</a>
-
 
                 </td>
             </tr>

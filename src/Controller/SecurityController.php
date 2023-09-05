@@ -83,4 +83,16 @@ class SecurityController extends AbstractController
             'form' => $form->createView(),
         ]);
     }
+        /**
+     * @Route("/logout", name="app_logout")
+     */
+    public function logout(LogoutSuccessHandlerInterface $logoutSuccessHandler): Response
+    {
+        // The actual logout logic is handled by Symfony's security system
+        // You can customize the logout behavior using the LogoutSuccessHandlerInterface
+
+        // Redirect to the target URL defined in security.yaml after successful logout
+        return $logoutSuccessHandler->onLogoutSuccess($this->getRequest());
+    }
+
 }
